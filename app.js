@@ -5,7 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-const compression = require("compression");
+const compression = require('compression');
+const helmet = require('helmet');
 
 var app = express();
 
@@ -27,6 +28,14 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  }),
+);
 
 app.use(compression());
 
