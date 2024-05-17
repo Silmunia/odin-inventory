@@ -1,3 +1,4 @@
+const Category = require("../models/Category");
 const Item = require("../models/Item");
 const asyncHandler = require("express-async-handler");
 
@@ -11,7 +12,21 @@ exports.item_list = asyncHandler(async (req, res, next) => {
 });
 
 exports.item_detail = asyncHandler(async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: Item Detail: ${req.params.id}`);
+
+    const selectedItem = await Item.findById(req.params.id).exec();
+
+    if (selectedItem === null) {
+        const error = new Error("Item not found");
+        error.status = 404;
+        return next(error);
+    }
+
+    const itemCategory = await Category.findById(selectedItem.category).exec();
+
+    res.render("item_detail", {
+        item: selectedItem,
+        item_category: itemCategory.name,
+    });
 });
 
 exports.item_create_get = asyncHandler(async (req, res, next) => {
