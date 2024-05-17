@@ -10,7 +10,8 @@ var app = express();
 
 const mongoose = require('mongoose');
 mongoose.set("strictQuery", false);
-const mongoConnection = "";
+const dev_db_url = "mongodb+srv://your_user_name:your_password@cluster0.kmsmitk.mongodb.net/inventory?retryWrites=true&w=majority&appName=Cluster0";
+const mongoConnection = process.env.MONGODB_URI || dev_db_url;
 
 main().catch((err) => console.log(err));
 async function main() {
