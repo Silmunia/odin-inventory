@@ -2,4 +2,13 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to #[em Odin Inventory], a very basic Express website with the purpose of being an inventory manager.
+
+  h2 Inventory Records
+
+  p The inventory has the following record counts:
+
+  ul
+    li #[strong Items:] !{item_count}
+    li #[strong Categories:] !{category_count}
+

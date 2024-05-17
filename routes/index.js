@@ -1,13 +1,23 @@
 var express = require('express');
 var router = express.Router();
+const asyncHandler = require("express-async-handler");
 
 const itemController = require("../controllers/ItemController");
 const categoryController = require("../controllers/CategoryController");
 
+const Item = require("../models/Item");
+const Category = require("../models/Category");
+
 /* GET home page. */
-router.get('/', function (req, res, next) {
-  res.render('index', { title: 'Odin Inventory' });
-});
+router.get('/', asyncHandler(async (req, res, next) => {
+
+  const [numItems, numCategories] = await Promise.all([
+    Item.countDocuments({}).exec(),
+    Category.countDocuments({}).exec()
+  ]);
+
+  res.render('index', { title: "Odin Inventory", item_count: numItems, category_count: numCategories });
+}));
 
 // CATEGORY ROUTES
 router.get('/categories', categoryController.category_list);
