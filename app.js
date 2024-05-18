@@ -5,12 +5,15 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
+const compression = require('compression');
+const helmet = require('helmet');
 
 var app = express();
 
 const mongoose = require('mongoose');
 mongoose.set("strictQuery", false);
-const mongoConnection = "";
+const dev_db_url = "mongodb+srv://your_user_name:your_password@cluster0.kmsmitk.mongodb.net/inventory?retryWrites=true&w=majority&appName=Cluster0";
+const mongoConnection = process.env.MONGODB_URI || dev_db_url;
 
 main().catch((err) => console.log(err));
 async function main() {
@@ -25,6 +28,24 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 40,
+});
+app.use(limiter);
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  }),
+);
+
+app.use(compression());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
