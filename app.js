@@ -5,9 +5,20 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const compression = require('compression');
+const helmet = require('helmet');
 
 var app = express();
+
+const mongoose = require('mongoose');
+mongoose.set("strictQuery", false);
+const dev_db_url = "mongodb+srv://your_user_name:your_password@cluster0.kmsmitk.mongodb.net/inventory?retryWrites=true&w=majority&appName=Cluster0";
+const mongoConnection = process.env.MONGODB_URI || dev_db_url;
+
+main().catch((err) => console.log(err));
+async function main() {
+  await mongoose.connect(mongoConnection);
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -17,18 +28,35 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+const RateLimit = require("express-rate-limit");
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 40,
+});
+app.use(limiter);
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  }),
+);
+
+app.use(compression());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

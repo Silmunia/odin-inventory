@@ -1,0 +1,25 @@
+extends layout
+
+block content
+
+  h1 #{item.name}
+
+  p
+    a(href=item.url+'/update') Update Item
+  p
+    a(href=item.url+'/delete') Delete Item
+  hr
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h2(style='font-size: 1.5rem;') Description
+    p= item.description
+
+    h2(style='font-size: 1.5rem;') Category
+    p= item_category
+
+    h2(style='font-size: 1.5rem;') Price
+    p $#{item.price}
+
+    h2(style='font-size: 1.5rem;') Stock
+    p #{item.stock} units
